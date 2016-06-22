@@ -32,6 +32,9 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.gvResults) GridView gvResults;
     ArrayList<Article> article = new ArrayList<Article>();
     ArticleArrayAdapter adapter;
+    String begin_date=null;
+    String end_date=null;
+    String sort = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +88,15 @@ public class SearchActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        if(id == R.id.filter_item){
+            Intent intent = new Intent(SearchActivity.this, FilterActivity.class);
+            startActivity(intent);
+            //1.start activity
+
+            //2.Receive information and store in appropriate param strings
+
+            //3.Recall client call and update list
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -96,8 +108,10 @@ public class SearchActivity extends AppCompatActivity {
         String uri = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", "8ad1eeff7c3942299c9b526dcbf7bddb");
-        //params.put("page", 0);
-        //params.put("q", etQuery.getText());
+        params.put("page", 1);
+        params.put("q", query);
+
+
         client.get(uri, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -129,4 +143,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

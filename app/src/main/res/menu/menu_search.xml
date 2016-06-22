@@ -16,6 +16,12 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/filter_item"
+        android:orderInCategory="100"
+        android:title="@string/filter"
+        app:showAsAction="never"
+        />
 
 
 </menu>
