@@ -42,8 +42,8 @@ public class ArticleArrayAdapter extends ArrayAdapter<Article> {
         String thumbnail = article.getThumbnail();
         Glide.with(getContext())
                 .load(thumbnail).placeholder(R.mipmap.nytimeslogo).crossFade(400)
-                .transform(new BlurTransformation(getContext()));
                 .into(viewholder.ivImage);
+            //Picasso.with(getContext()).load(thumbnail).into(viewholder.ivImage);
 
         viewholder.tvTitle.setText(article.getHeadline());
 
