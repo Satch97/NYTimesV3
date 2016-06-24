@@ -1,7 +1,6 @@
 package com.example.satchinc.nytimes;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -41,9 +40,11 @@ public class ArticleArrayAdapter extends ArrayAdapter<Article> {
             viewholder= (ViewHolder) convertView.getTag();
         }
         String thumbnail = article.getThumbnail();
-        if(!TextUtils.isEmpty(thumbnail)) {
-            Picasso.with(getContext()).load(thumbnail).into(viewholder.ivImage);
-        }
+        Glide.with(getContext())
+                .load(thumbnail).placeholder(R.mipmap.nytimeslogo).crossFade(400)
+                .transform(new BlurTransformation(getContext()));
+                .into(viewholder.ivImage);
+
         viewholder.tvTitle.setText(article.getHeadline());
 
 

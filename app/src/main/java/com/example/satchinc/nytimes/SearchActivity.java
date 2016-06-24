@@ -33,7 +33,7 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<Article> article = new ArrayList<Article>();
     ArticleArrayAdapter adapter;
     int morePage = 0;
-    String begin_date="-1";
+    String begin_date="20150606";
     String end_date=null;
     String sort = "newest";
     String fq = "-1" ;
