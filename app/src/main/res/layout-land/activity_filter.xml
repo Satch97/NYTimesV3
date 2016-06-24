@@ -18,9 +18,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spSort"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/cbSports"
         android:layout_toRightOf="@+id/tvSortByTitle"
-        android:layout_toEndOf="@+id/tvSortByTitle" />
+        android:layout_alignRight="@+id/linearLayout"
+        android:layout_alignEnd="@+id/linearLayout" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -28,10 +29,10 @@
         android:text="Fashion &amp; Style"
         android:id="@+id/cbFashion"
         android:checked="false"
-        android:layout_below="@+id/cbArts"
-        android:layout_alignLeft="@+id/cbArts"
-        android:layout_alignStart="@+id/cbArts"
-        android:onClick="onCheckboxClicked"/>
+        android:onClick="onCheckboxClicked"
+        android:layout_above="@+id/cbSports"
+        android:layout_alignLeft="@+id/cbSports"
+        android:layout_alignStart="@+id/cbSports" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -39,10 +40,10 @@
         android:text="Arts"
         android:id="@+id/cbArts"
         android:checked="false"
-        android:layout_below="@+id/spSort"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="52dp"
-        android:onClick="onCheckboxClicked"/>
+        android:onClick="onCheckboxClicked"
+        android:layout_above="@+id/cbFashion"
+        android:layout_alignLeft="@+id/cbFashion"
+        android:layout_alignStart="@+id/cbFashion" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -50,47 +51,38 @@
         android:text="Sports"
         android:id="@+id/cbSports"
         android:checked="false"
-        android:layout_below="@+id/cbFashion"
-        android:layout_alignLeft="@+id/cbFashion"
-        android:layout_alignStart="@+id/cbFashion"
-        android:onClick="onCheckboxClicked"/>
+        android:onClick="onCheckboxClicked"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/tvHeader"
+        android:layout_toEndOf="@+id/tvHeader" />
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
 
         android:weightSum="1"
         android:id="@+id/linearLayout"
-        android:layout_above="@+id/spSort"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="52dp">
 
-        <TextView
-            android:layout_width="97dp"
-            android:layout_height="match_parent"
-            android:text="@string/tvDate"
-            android:id="@+id/tvBeginDate"
-            android:textSize ="16sp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:gravity="center_vertical"
-            android:paddingLeft="4dp"
-           />
+
+
+        android:layout_below="@+id/tvHeader"
+        android:layout_toRightOf="@+id/tvSortByTitle"
+        android:layout_above="@+id/cbSports">
+
         <Button
             android:id="@+id/btnPickDate"
             android:layout_width="179dp"
             android:layout_height="wrap_content"
             android:text="pick date"
-            android:layout_alignTop="@+id/tvBeginDate"
+            android:onClick="showDatePickerDialog"
+            android:layout_weight="0.03"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/tvBeginDate"
-            android:layout_toEndOf="@+id/tvBeginDate"
-            android:onClick="showDatePickerDialog"
-            android:layout_weight="0.61" />
-    </LinearLayout>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
 
     <TextView
         android:layout_width="97dp"
@@ -98,21 +90,25 @@
         android:text="News Desk Values"
         android:id="@+id/tvNews"
         android:textSize="16sp"
-        android:gravity="center_vertical"
+        android:paddingRight="15dp"
+        android:gravity="center"
+        android:paddingLeft="15dp"
         android:layout_alignTop="@+id/cbArts"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignBottom="@+id/cbSports"
-        android:paddingLeft="4dp"/>
+        android:layout_toLeftOf="@+id/cbFashion"
+        android:layout_toStartOf="@+id/cbFashion"
+        android:layout_alignBottom="@+id/cbSports" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/submittitle"
         android:id="@+id/button"
+        android:onClick="onSubmit"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onSubmit" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/cbSports"
+        android:layout_alignStart="@+id/cbSports" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -121,9 +117,10 @@
         android:id="@+id/tvHeader"
         android:textSize="40sp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-       />
+        android:gravity="center_vertical"
+        android:layout_above="@+id/tvNews"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -134,10 +131,23 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignBottom="@+id/spSort"
-        android:layout_toStartOf="@+id/button"
         android:layout_alignTop="@+id/spSort"
         android:textSize="16sp"
+        android:gravity="center_vertical" />
+
+    <TextView
+        android:layout_width="97dp"
+        android:layout_height="match_parent"
+        android:text="@string/tvDate"
+        android:id="@+id/tvBeginDate"
+        android:textSize ="16sp"
         android:gravity="center_vertical"
-        android:layout_toLeftOf="@+id/button" />
+        android:paddingLeft="4dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/linearLayout"
+        android:layout_alignTop="@+id/linearLayout"
+        android:layout_toLeftOf="@+id/linearLayout"
+        android:layout_alignBottom="@+id/linearLayout" />
 
 </RelativeLayout>

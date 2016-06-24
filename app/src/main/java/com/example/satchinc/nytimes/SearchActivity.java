@@ -32,9 +32,17 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.gvResults) GridView gvResults;
     ArrayList<Article> article = new ArrayList<Article>();
     ArticleArrayAdapter adapter;
-    String begin_date=null;
+    int morePage = 0;
+    String begin_date="-1";
     String end_date=null;
-    String sort = null;
+    String sort = "newest";
+    String fq = "-1" ;
+    String lastQuery = "-1";
+    RequestParams params;
+    String ARTICLESEARCHURI = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    String TOPSTORIESURI = "https://api.nytimes.com/svc/topstories/v2/home.json";
+    int REQUEST_CODE=30;
+    public String API_KEY = "8ad1eeff7c3942299c9b526dcbf7bddb";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,10 +50,15 @@ public class SearchActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Top Stories");
 
+
+        //toolbar.setTitle("NYTimesnwefjkoen");
         article = new ArrayList<Article>();
         adapter = new ArticleArrayAdapter(this,article);
         gvResults.setAdapter(adapter);
+        getTopStories();
+
 
     }
 
@@ -59,7 +72,6 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
-                Toast.makeText(getApplicationContext(),"Successfully Searching for " + query,Toast.LENGTH_SHORT).show();
                 onArticleSearch(query);
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
@@ -90,29 +102,88 @@ public class SearchActivity extends AppCompatActivity {
         }
         if(id == R.id.filter_item){
             Intent intent = new Intent(SearchActivity.this, FilterActivity.class);
-            startActivity(intent);
-            //1.start activity
+            intent.putExtra("query", lastQuery);
+            startActivityForResult(intent, REQUEST_CODE);
 
-            //2.Receive information and store in appropriate param strings
-
-            //3.Recall client call and update list
         }
+
 
         return super.onOptionsItemSelected(item);
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK && requestCode==REQUEST_CODE){
+        String checkQuery = data.getExtras().getString("query");
+        begin_date=data.getExtras().getString("begin_date");
+        fq = data.getExtras().getString("fq");
+        sort=data.getExtras().getString("sort");
+        if(!(checkQuery.equals("-1"))){onArticleSearch(lastQuery);}
+        }
+    }
     public void onArticleSearch(String query) {
-
-        Toast.makeText(this,"Searching for " +  query,Toast.LENGTH_SHORT).show();
         AsyncHttpClient client = new AsyncHttpClient();
-        String uri = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
-        RequestParams params = new RequestParams();
-        params.put("api-key", "8ad1eeff7c3942299c9b526dcbf7bddb");
-        params.put("page", 1);
+        lastQuery=query;
+        setParams(query);
+        client.get(ARTICLESEARCHURI, params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray articleJsonResults = null;
+                try {
+                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+                    adapter.clear();
+                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.notifyDataSetChanged();
+
+                    Log.d("debug", article.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getApplicationContext(),"The client has failed to receive successful data", Toast.LENGTH_SHORT).show();
+            }
+        });
+        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(),ArticleActivity.class);
+                Article passArticle = article.get(position);
+                intent.putExtra("url", passArticle.getWebURL());
+                startActivity(intent);
+            }
+        });
+        gvResults.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+
+                customLoadMoreDataFromApi(page+1);
+
+                return true;
+            }
+        });
+    }
+    public void setParams(String query) {
+        params = new RequestParams();
+        params.put("api-key", API_KEY);
+        params.put("page", 0);
+        params.put("begin_date", begin_date);
+        if (!(fq.equals("-1"))){
+            //news_desk:("Education"%20"Health")
+            //Fix the news desk
+            params.put("fq", fq);
+        }
         params.put("q", query);
+        params.put("sort", sort);
+    }
 
-
-        client.get(uri, params, new JsonHttpResponseHandler(){
+    public void customLoadMoreDataFromApi(int offset) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        setParams(lastQuery);
+        params.remove("page");
+        params.put("page", Integer.toString(offset));
+        client.get(ARTICLESEARCHURI, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray articleJsonResults = null;
@@ -129,7 +200,37 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("Debug", "failure"); ;
+                Toast.makeText(getApplicationContext(),"The client has failed to receive anymore successful data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void getTopStories() {
+        AsyncHttpClient topClient = new AsyncHttpClient();
+        RequestParams tsParams = new RequestParams();
+        tsParams.put("api-key", API_KEY);
+        topClient.get(TOPSTORIESURI, tsParams, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray articleJsonResults = null;
+                try {
+                    Log.d("debug", response.toString());
+                    //SET UP A HANDLER
+                    articleJsonResults = response.getJSONArray("results");
+                    adapter.clear();
+                    adapter.addAll(Article.tsfromJSONArray(articleJsonResults));
+                    //articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+
+                    //adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getApplicationContext(),"The client has failed to receive successful data", Toast.LENGTH_SHORT).show();
             }
         });
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -139,10 +240,12 @@ public class SearchActivity extends AppCompatActivity {
                 Article passArticle = article.get(position);
                 intent.putExtra("url", passArticle.getWebURL());
                 startActivity(intent);
-                Toast.makeText(getApplicationContext(),"this", Toast.LENGTH_LONG).show();
             }
         });
+
     }
+
+
 
 
 }

@@ -4,4 +4,15 @@
     <string name="searchHint">Enter Search Here</string>
     <string name="search">Search</string>
     <string name="filter">Filter</string>
+    <string name="tvDate">Begin Date</string>
+    <string name="arts">Arts</string>
+    <string name="fashion"><![CDATA[Fashion & Style]]></string>
+    <string name="filtertitle">Filter Options</string>
+    <string name="sortbytitle">Sort By :</string>
+    <string name="tvenddate">End Date</string>
+    <string name="submittitle">Submit</string>
+    <string-array name="sort_array">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>
