@@ -133,6 +133,7 @@ public class SearchActivity extends AppCompatActivity {
                     adapter.clear();
                     adapter.addAll(Article.fromJSONArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
+                    getSupportActionBar().setTitle("Results for : " + lastQuery) ;
 
                     Log.d("debug", article.toString());
                 } catch (JSONException e) {
